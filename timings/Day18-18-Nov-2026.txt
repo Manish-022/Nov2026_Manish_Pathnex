@@ -9,7 +9,3 @@
 - coding practice
 - evening class 
 - intro
-
-New-Item -Path ".\coding-practice\Day18.md" -ItemType File
-
-New-Item -Path ".\timings\Day18-18-Nov-2026.txt" -ItemType File
