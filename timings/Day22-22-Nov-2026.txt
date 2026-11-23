@@ -12,6 +12,6 @@
 - evening class 
 - intro
 
-New-Item -Path ".\coding-practice\Day22.md" -ItemType File
+New-Item -Path ".\coding-practice\Day23.md" -ItemType File
 
-New-Item -Path ".\timings\Day22-22-Nov-2026.txt" -ItemType File
+New-Item -Path ".\timings\Day23-23-Nov-2026.txt" -ItemType File
