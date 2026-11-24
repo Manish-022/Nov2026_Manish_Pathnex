@@ -2,7 +2,7 @@
 
 ## * Ansible - Deploy Docker Containers with Kubernetes Using Helm
 
-#```yaml
+```yaml
 - name: Deploy Docker COntainer with Helm
   hosts: localhost
   tasks:
