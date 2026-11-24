@@ -1,0 +1,20 @@
+## What I did today
+- 5 hr - lecture
+- 3 hr - coding
+- 1 hr - revision
+- 30 min - introduction
+
+
+
+
+## Tomorrow's Task
+- Morning Lecture
+- Previous video
+- revision
+- coding practice
+- evening class 
+- intro
+
+New-Item -Path ".\coding-practice\Day5.md" -ItemType File
+
+New-Item -Path ".\timings\Day5-25-Nov-2026.txt" -ItemType File
