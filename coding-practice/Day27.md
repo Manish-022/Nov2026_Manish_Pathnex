@@ -1,95 +1,58 @@
-# Day 09 - Docker Integration with Jenkins & Gitlab
-* Ansible - Setup Docker Container for Nginx
-- name: Setup Docker Container for Nginx
-  hosts: all
-  become: yes
-  tasks:
-    - name: Pull Nginx image
-      docker_image:
-        name: nginx
-        source: pull
-    - name: Run Nginx container
-      docker_container:
-        name: nginx-container
-        image: nginx
-        state: started
-        published_ports:
-          - "8080:80"
-* Terraform - EC2 with Auto Scaling Group
-resource "aws_launch_configuratiion" "example" {
-    name = "example-config"
-    image_id = "ami-0abcd1234abcd1234"
-    instance_type = "t3.medium"
+# Day 27 - Serverless Scaling with Lambda and DynamoDB
+* Ansible - Deploy Serverless Lambda Functions
+ - name: Deploy Serverless Lambda Function
+   hosts: localhost
+   tasks:
+     - name: Create Lambda function
+      command: aws lambda create-function --function-name pathnex-lambda --runtime nodejs14.x --role arn:aws:iam::123456789012:role/lambda-role --handler index.handler --zip-file fileb://lambda.zip
+* Terraform - Create DynamoDB Table for Serverless Aplication
+resource "aws_dynamodb_table" "pathnex_table" {
+    name          = "pathnex-table"
+    hash_key      = "id"
+    billing_mode  = "PAY_PER_REQUEST"
+    attribute {
+        name = "id"
+        type = "S"
+    }
 }
-
-resource "aws_autoscaling_group" "example" {
-    desired_capacity  = 2
-    max_size          = 3
-    min_size          = 1
-    vpc_zone_identifier  = ["subnet-12345678]
-    launch_configuration = aws_launch_configuration.example.id
-}
-* Kubernetes - Horizontal Pod Autoscaler(HPA)
-apiVersion: apps/v1
-kind: Deployment
+* Kubernetes - Deploy Serverless Using Kubeless
+apiVersion: kubeless.io/v1beta1
+kind: Function
 metadata:
-  name: pathnex-deployment
+  name: pathnex-lambda
+  namespace: default
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: pathnex-app
-   template:
-     metadata:
-        labels:
-          app: pathnex-app
-      spec:
-        containers:
-          - name: nginx
-            image: nginx
-            ports:
-              - containerPort: 80
-
----
-
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: pathnex-hpa
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: pathnex-deployment
-  minReplicas: 1
-  maxReplicas: 10
-  targetCPUUtilizationPercentage: 50
-* Jenkinsfile - Deploy to Kubernetes
+  runtime: nodejs14
+  handler: index.handler
+  function: |
+    module.exports = function(event,context) {
+        context.succeed('Hello world');
+    };
+* Jenkinsfile - Lambda Function Deployment Pipeline
 pipeline {
     agent any 
     stages {
-        stage('Deploy to Kubernetes') {
+        stage('Build') {
+            steps {
+                echo 'Building Lambda function package...'
+                sh 'zip -r lambda.zip lambda/'
+            }
+        }
+        stage('Deploy to Lambda') {
             steps {
                 script {
-                    sh 'kubectl apply -f deployment.yaml'
+                    sh 'aws lambda update-function-code --function-name pathnex-lambda --zip-file fileb://lambda.zip'
                 }
             }
         }
     }
 }
-* GitLab CI/CD - Deploy to Kubernetes
-stages:
-  - deploy
-
-deploy:
-  stage: deploy
-  script:
-    - kubectl apply -f kubernetes/deployment.yaml
 
 
-* Docker 
-# Environment Variables
-From ubuntu:22.04
-ENV INSTITUTE=Pathnex
-ENV COURSE=Devops
-CMD echo "$INSTITUTE - $COURSE"
+* Docker
+# Docker Exec & Resource Limits
+docker exec -it pathnex-nginx bash
+docker stats
+
+# Bash
+docker run -d --memory="512m" --cpus="1.0" nginx
